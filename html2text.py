@@ -1,15 +1,22 @@
 #!/usr/bin/env python
-# encoding: utf-8
+# -*- coding: utf-8 -*-
 
 """ html2text: Turn HTML into equivalent Markdown-structured text.
 """
+
 __version__ = "3.03"
 __author__ = "Aaron Swartz (me@aaronsw.com)"
 __copyright__ = "(C) 2004-2008 Aaron Swartz. GNU GPL 3."
 __contributors__ = ["Martin 'Joey' Schulze", "Ricardo Reyes", "Kevin Jay North"]
 
 # TODO:
-#   Support decoded entities with unifiable.
+#   - OptParse: generate helpful help.
+#   - OptParse: options for UNICODE_SNOB, LINKS_EACH_PARAGRAPH, BODY_WIDTH, SKIP_INTERNAL_LINKS
+#   - Unicode-safe for sys.stdout in python2?
+#        import sys, codecs, locale
+#        sys.stdout = codecs.open('/dev/stdout', 'w', 
+#            sys.stdout.encoding or locale.getpreferredencoding().lower() or 'utf-8')
+#   - (?) Support decoded entities with unifiable.
 
 try:
     True
@@ -495,3 +502,4 @@ if __name__ == "__main__":
         data = sys.stdin.read()
     
     wrapwrite(html2text(data, baseurl))
+
