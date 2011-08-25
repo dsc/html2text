@@ -1,5 +1,8 @@
 #!/usr/bin/env python
-"""html2text: Turn HTML into equivalent Markdown-structured text."""
+# encoding: utf-8
+
+""" html2text: Turn HTML into equivalent Markdown-structured text.
+"""
 __version__ = "3.02"
 __author__ = "Aaron Swartz (me@aaronsw.com)"
 __copyright__ = "(C) 2004-2008 Aaron Swartz. GNU GPL 3."
@@ -47,6 +50,7 @@ BODY_WIDTH = 78
 # Don't show internal links (href="#local-anchor") -- corresponding link targets
 # won't be visible in the plain text file anyway.
 SKIP_INTERNAL_LINKS = False
+
 
 ### Entity Nonsense ###
 
@@ -111,6 +115,7 @@ def unescape(s):
 
 ### End Entity Nonsense ###
 
+
 def onlywhite(line):
     """Return true if the line does only consist of whitespace characters."""
     for c in line:
@@ -150,7 +155,9 @@ def hn(tag):
             if n in range(1, 10): return n
         except ValueError: return 0
 
+
 class _html2text(HTMLParser.HTMLParser):
+    
     def __init__(self, out=None, baseurl=''):
         HTMLParser.HTMLParser.__init__(self)
         
@@ -188,23 +195,21 @@ class _html2text(HTMLParser.HTMLParser):
         self.o('', 0, 'end')
         
         return self.outtext
-        
+    
     def handle_charref(self, c):
         self.o(charref(c))
-
+    
     def handle_entityref(self, c):
         self.o(entityref(c))
-            
+    
     def handle_starttag(self, tag, attrs):
         self.handle_tag(tag, attrs, 1)
     
     def handle_endtag(self, tag):
         self.handle_tag(tag, None, 0)
-        
+    
     def previousIndex(self, attrs):
-        """ returns the index of certain set of attributes (of a link) in the
-            self.a list
- 
+        """ returns the index of certain set of attributes (of a link) in the self.a list
             If the set of attributes is not found, returns None
         """
         if not has_key(attrs, 'href'): return None
@@ -221,29 +226,29 @@ class _html2text(HTMLParser.HTMLParser):
                             match = True
                 else:
                     match = True
-
+            
             if match: return i
-
+    
     def handle_tag(self, tag, attrs, start):
         #attrs = fixattrs(attrs)
-    
+        
         if hn(tag):
             self.p()
             if start: self.o(hn(tag)*"#" + ' ')
-
+        
         if tag in ['p', 'div']: self.p()
         
         if tag == "br" and start: self.o("  \n")
-
+        
         if tag == "hr" and start:
             self.p()
             self.o("* * *")
             self.p()
-
+        
         if tag in ["head", "style", 'script']: 
             if start: self.quiet += 1
             else: self.quiet -= 1
-
+        
         if tag in ["body"]:
             self.quiet = 0 # sites like 9rules.com never close <head>
         
@@ -354,10 +359,10 @@ class _html2text(HTMLParser.HTMLParser):
             else:
                 self.pre = 0
             self.p()
-            
+    
     def pbr(self):
         if self.p_p == 0: self.p_p = 1
-
+    
     def p(self): self.p_p = 2
     
     def o(self, data, puredata=0, force=0):
@@ -386,25 +391,24 @@ class _html2text(HTMLParser.HTMLParser):
                 self.space = 0
                 self.p_p = 0
                 self.start = 0
-
+            
             if force == 'end':
                 # It's the end.
                 self.p_p = 0
                 self.out("\n")
                 self.space = 0
-
-
+            
             if self.p_p:
                 self.out(('\n'+bq)*self.p_p)
                 self.space = 0
-                
+            
             if self.space:
                 if not self.lastWasNL: self.out(' ')
                 self.space = 0
-
+            
             if self.a and ((self.p_p == 2 and LINKS_EACH_PARAGRAPH) or force == "end"):
                 if force == "end": self.out("\n")
-
+                
                 newa = []
                 for link in self.a:
                     if self.outcount > link['outcount']:
@@ -421,17 +425,18 @@ class _html2text(HTMLParser.HTMLParser):
             if self.abbr_list and force == "end":
                 for abbr, definition in self.abbr_list.items():
                     self.out("  *[" + abbr + "]: " + definition + "\n")
-
+            
             self.p_p = 0
             self.out(data)
             self.lastWasNL = data and data[-1] == '\n'
             self.outcount += 1
-
+    
     def handle_data(self, data):
         if r'\/script>' in data: self.quiet -= 1
         self.o(data, 1)
     
     def unknown_decl(self, data): pass
+
 
 def wrapwrite(text):
     text = text.encode('utf-8')
@@ -449,9 +454,9 @@ def html2text_file(html, out=wrapwrite, baseurl=''):
 def html2text(html, baseurl=''):
     return optwrap(html2text_file(html, None, baseurl))
 
+
 if __name__ == "__main__":
     baseurl = ''
-
     p = optparse.OptionParser('%prog [(filename|url) [encoding]]',
                               version='%prog ' + __version__)
     args = p.parse_args()[1]
@@ -462,7 +467,7 @@ if __name__ == "__main__":
             encoding = args[1]
         if len(args) > 2:
             p.error('Too many arguments')
-
+        
         if file_.startswith('http://') or file_.startswith('https://'):
             baseurl = file_
             j = urllib.urlopen(baseurl)
@@ -476,7 +481,7 @@ if __name__ == "__main__":
                 if encoding == 'us-ascii':
                     encoding = 'utf-8'
             data = text.decode(encoding)
-
+            
         else:
             data = open(file_, 'rb').read()
             if encoding is None:
@@ -488,4 +493,5 @@ if __name__ == "__main__":
             data = data.decode(encoding)
     else:
         data = sys.stdin.read()
+    
     wrapwrite(html2text(data, baseurl))
