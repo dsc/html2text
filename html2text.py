@@ -462,7 +462,7 @@ def html2text(html, baseurl=''):
     return optwrap(html2text_file(html, None, baseurl))
 
 
-if __name__ == "__main__":
+def main():
     baseurl = ''
     p = optparse.OptionParser('%prog [(filename|url) [encoding]]',
                               version='%prog ' + __version__)
@@ -502,4 +502,8 @@ if __name__ == "__main__":
         data = sys.stdin.read()
     
     wrapwrite(html2text(data, baseurl))
+
+
+if __name__ == "__main__":
+    main()
 
