@@ -1,3 +1,6 @@
+#!python
+# -*- coding: utf-8 -*-
+
 import sys
 from setuptools import setup, find_packages
 
@@ -29,4 +32,7 @@ setup(
    py_modules=['html2text'],
    include_package_data=True,
    zip_safe=False,
+   entry_points={
+       'console_scripts': ['html2text = html2text:main']
+   },
 )
